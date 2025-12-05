@@ -70,7 +70,7 @@ N64_DSO = $(N64_BINDIR)/n64dso
 N64_DSOEXTERN = $(N64_BINDIR)/n64dso-extern
 N64_DSOMSYM = $(N64_BINDIR)/n64dso-msym
 
-N64_C_AND_CXX_FLAGS =  -march=vr4300 -mtune=vr4300 -mabi=o64 -I$(N64_INCLUDEDIR)/newlib_overrides -I$(N64_INCLUDEDIR) -include ktls.h
+N64_C_AND_CXX_FLAGS =  -march=vr4300 -mtune=vr4300 -mabi=32 -I$(N64_INCLUDEDIR)/newlib_overrides -I$(N64_INCLUDEDIR) -include ktls.h
 N64_C_AND_CXX_FLAGS += -falign-functions=32   # NOTE: if you change this, also change backtrace() in backtrace.c
 N64_C_AND_CXX_FLAGS += -ffunction-sections -fdata-sections -g -ffile-prefix-map="$(CURDIR)"=$(N64_BACKTRACE_FILE_PREFIX)
 N64_C_AND_CXX_FLAGS += -ffast-math -ftrapping-math -fno-associative-math
@@ -79,8 +79,8 @@ N64_C_AND_CXX_FLAGS += -Wno-error=unused-variable -Wno-error=unused-but-set-vari
 N64_C_AND_CXX_FLAGS += -ftrivial-auto-var-init=pattern
 N64_CFLAGS = $(N64_C_AND_CXX_FLAGS) -std=gnu17
 N64_CXXFLAGS = $(N64_C_AND_CXX_FLAGS) -std=gnu++17
-N64_ASFLAGS = -mtune=vr4300 -march=vr4300 -mabi=o64 -Wa,--fatal-warnings -I$(N64_INCLUDEDIR)
-N64_RSPASFLAGS = -march=mips1 -mabi=32 -Wa,--fatal-warnings -I$(N64_INCLUDEDIR)
+N64_ASFLAGS = -mtune=vr4300 -march=vr4300 -mabi=32  -I$(N64_INCLUDEDIR)
+N64_RSPASFLAGS = -march=mips1 -mabi=32  -I$(N64_INCLUDEDIR)
 N64_LDFLAGS = -g -L$(N64_LIBDIR) -ldragon -lm -ldragonsys -Tn64.ld --gc-sections --wrap __do_global_ctors
 N64_DSOLDFLAGS = --emit-relocs --unresolved-symbols=ignore-all --nmagic -T$(N64_LIBDIR)/dso.ld
 
@@ -226,10 +226,10 @@ $(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
 	EXTERNS_FILE="$(filter %.externs, $^)"; \
 	if [ -z "$$EXTERNS_FILE" ]; then \
 		$(CXX) -o $@ $(filter %.o, $^) $(filter-out $(N64_LIBDIR)/libdragon.a $(N64_LIBDIR)/libdragonsys.a, $(filter %.a, $^)) \
-			-lc -mabi=o64 $(patsubst %,-Wl$(COMMA)%,$(LDFLAGS)) -Wl,-Map=$(BUILD_DIR)/$(notdir $(basename $@)).map,--cref; \
+			-lc -mabi=32 $(patsubst %,-Wl$(COMMA)%,$(LDFLAGS)) -Wl,-Map=$(BUILD_DIR)/$(notdir $(basename $@)).map,--cref; \
 	else \
 		$(CXX) -o $@ $(filter %.o, $^) $(filter-out $(N64_LIBDIR)/libdragon.a $(N64_LIBDIR)/libdragonsys.a, $(filter %.a, $^)) \
-			-lc -mabi=o64 $(patsubst %,-Wl$(COMMA)%,$(LDFLAGS)) -Wl,-T"$$EXTERNS_FILE" -Wl,-Map=$(BUILD_DIR)/$(notdir $(basename $@)).map,--cref; \
+			-lc -mabi=32 $(patsubst %,-Wl$(COMMA)%,$(LDFLAGS)) -Wl,-T"$$EXTERNS_FILE" -Wl,-Map=$(BUILD_DIR)/$(notdir $(basename $@)).map,--cref; \
 	fi
 	$(N64_SIZE) -G $@
 
